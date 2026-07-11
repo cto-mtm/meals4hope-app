@@ -1,0 +1,67 @@
+/* ════════════════════════════════════════════════════════════
+   VIEW TRANSITION RECIPES
+   Rules of the house:
+   - Animate ONLY transform and opacity (compositor-friendly).
+   - Durations 200–350ms. Easing: cubic-bezier(0.4, 0, 0.2, 1).
+   - Every recipe must look acceptable if it simply cross-fades
+     (that's the automatic fallback).
+   - view-transition-name must be UNIQUE per page at any moment:
+     in a v-for always derive it from the record id, never static.
+   ════════════════════════════════════════════════════════════ */
+
+/* Recipe 1 — default page cross-fade (applies to everything) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Recipe 2 — hero elements (list card → detail header morph).
+   The morph itself is automatic once source and target share a
+   view-transition-name (e.g. 'entrada-<id>'); we only tune timing. */
+::view-transition-group(*) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Recipe 3 — reduced motion: kill everything. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Recipe 4 — within-page list enter/leave/reorder (Vue <TransitionGroup
+   name="list">). FLIP moves come free via .list-move. */
+.list-enter-active,
+.list-leave-active {
+  transition:
+    opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.list-leave-active {
+  position: absolute;
+}
+.list-move {
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Recipe 5 — modal / bottom-sheet enter+leave (Vue <Transition name="sheet">) */
+.sheet-enter-active,
+.sheet-leave-active {
+  transition:
+    opacity 220ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sheet-enter-from,
+.sheet-leave-to {
+  opacity: 0;
+  transform: translateY(24px);
+}

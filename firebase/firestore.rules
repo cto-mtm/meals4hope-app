@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// Internal tool: only authenticated, ACTIVE M4H members touch data.
+// Admin-only areas: users and catalogs (areas, lineas).
+// User provisioning happens via the Cloud Functions API (Admin SDK),
+// so clients never create users/{uid} docs directly.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function me() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isActiveMember() {
+      return signedIn() && me().activo == true;
+    }
+
+    function isAdmin() {
+      return signedIn() && me().activo == true && me().role == 'admin';
+    }
+
+    // Users: everyone signed in can read (needed to display names, pick
+    // "contacto M4H"); only the Functions API (Admin SDK) writes.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Admin-editable catalogs
+    match /areas/{id} {
+      allow read: if isActiveMember();
+      allow write: if isAdmin();
+    }
+    match /lineas/{id} {
+      allow read: if isActiveMember();
+      allow write: if isAdmin();
+    }
+
+    // Core entities — full CRUD for active members. Deletes are soft
+    // (deletedAt field), so hard delete is blocked everywhere.
+    match /entradas/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
+    match /salidas/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
+    match /facturas/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
+    match /attachments/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
+    match /organizations/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
+    match /contacts/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
+
+    // Audit log: append-only, immutable.
+    match /auditLogs/{id} {
+      allow read: if isActiveMember();
+      allow create: if isActiveMember();
+      allow update, delete: if false;
+    }
+  }
+}

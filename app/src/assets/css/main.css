@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+
+/* Brand tokens sampled from meals4hope.org (Divi theme):
+   deep blue #3d78b7 (buttons), bright blue #2ea3f2 (links/accents),
+   green #73bf43 (logo/highlights), warm off-white #f5f4ee (sections),
+   warm grays #706868 / #5b5252 (headings). Font: Open Sans. */
+@theme {
+  --color-brand-50: #eef5fb;
+  --color-brand-100: #d9e8f5;
+  --color-brand-500: #4a86c4;
+  --color-brand-600: #3d78b7;
+  --color-brand-700: #35689f;
+  --color-brand-800: #2b5484;
+  --color-accent-500: #2ea3f2;
+  --color-leaf-100: #e4f3d9;
+  --color-leaf-600: #73bf43;
+  --color-leaf-700: #5da335;
+  --color-paper: #f5f4ee;
+  --font-sans: 'Open Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+
+/* Safe-area utilities: correct in the browser AND inside the iOS/Android
+   shells (requires viewport-fit=cover in index.html). */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility mt-safe {
+  margin-top: env(safe-area-inset-top);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-paper text-stone-700 antialiased;
+  font-family: var(--font-sans);
+}

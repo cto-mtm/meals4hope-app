@@ -1,0 +1,11 @@
+{
+  "name": "meals4hope-firebase",
+  "private": true,
+  "scripts": {
+    "emulators": "npm --prefix functions run build && firebase emulators:start --only auth,functions,firestore,storage --project demo-meals4hope",
+    "emulators:persist": "npm --prefix functions run build && firebase emulators:start --only auth,functions,firestore,storage --project demo-meals4hope --import ./.emulator-data --export-on-exit",
+    "emulators:watch": "firebase emulators:start --only auth,functions,firestore,storage --project demo-meals4hope",
+    "seed": "node functions/scripts/seed.mjs",
+    "seed:demo": "node functions/scripts/seed.mjs --demo"
+  }
+}
