@@ -140,8 +140,34 @@ const proximas = computed(() => {
     .filter((e) => e.fechaInicio)
     .sort((a, b) => a.fechaInicio!.localeCompare(b.fechaInicio!))
   const undated = open.filter((e) => !e.fechaInicio)
-  return [...dated, ...undated].slice(0, 5)
+  return [...dated, ...undated]
 })
+
+/* ── Load-more pattern ───────────────────────────────────────────
+ * Lists show LIMIT rows so the dashboard keeps a stable shape.
+ * "Cargar más" reveals the full list INSIDE a fixed-height scroll
+ * area — the card never grows. */
+const LIMIT = 6
+type SectionKey = 'seguimiento' | 'organizador' | 'proximas' | 'actividad'
+const expanded = ref<Record<SectionKey, boolean>>({
+  seguimiento: false,
+  organizador: false,
+  proximas: false,
+  actividad: false,
+})
+
+function visible<T>(list: T[], key: SectionKey): T[] {
+  return expanded.value[key] ? list : list.slice(0, LIMIT)
+}
+
+function hasMore(list: unknown[], key: SectionKey): boolean {
+  return !expanded.value[key] && list.length > LIMIT
+}
+
+const segVisible = computed(() => visible(seguimiento.value, 'seguimiento'))
+const orgVisible = computed(() => visible(porOrganizador.value, 'organizador'))
+const proxVisible = computed(() => visible(proximas.value, 'proximas'))
+const actVisible = computed(() => visible(activity.value, 'actividad'))
 
 function initials(name: string): string {
   return name
@@ -156,7 +182,7 @@ onMounted(async () => {
   await directory.load()
   ;[iniciativas.value, activity.value] = await Promise.all([
     fetchAll<Entrada>('entrada'),
-    fetchRecentActivity(8),
+    fetchRecentActivity(30),
   ])
   loading.value = false
 })
@@ -259,13 +285,13 @@ onMounted(async () => {
             <span class="text-xs text-ink-400">{{ t('dashboard.seguimientoSubtitle') }}</span>
           </div>
           <p v-if="seguimiento.length === 0" class="py-3 text-[12.5px] text-ink-400">{{ t('common.sinDatos') }}</p>
-          <div v-else class="flex flex-col">
+          <div v-else class="flex flex-col" :class="expanded.seguimiento ? 'max-h-[264px] overflow-y-auto pr-1' : ''">
             <RouterLink
-              v-for="({ e, chips }, i) in seguimiento"
+              v-for="({ e, chips }, i) in segVisible"
               :key="e.id"
               :to="{ name: 'iniciativa-detail', params: { id: e.id } }"
               class="flex items-center gap-3 py-2.5"
-              :class="[i < seguimiento.length - 1 ? 'border-b border-line-100' : '', chips.length === 0 ? 'opacity-55' : '']"
+              :class="[i < segVisible.length - 1 ? 'border-b border-line-100' : '', chips.length === 0 ? 'opacity-55' : '']"
             >
               <span class="min-w-0 flex-1 truncate text-[13px] font-bold">{{ e.nombreIniciativa }}</span>
               <span class="flex flex-wrap justify-end gap-1.5">
@@ -286,6 +312,14 @@ onMounted(async () => {
               <span v-if="chips.length" class="text-ink-300">→</span>
             </RouterLink>
           </div>
+          <button
+            v-if="hasMore(seguimiento, 'seguimiento')"
+            type="button"
+            class="mt-1 w-full border-t border-line-100 pt-2 text-center text-xs font-semibold text-brand-600 hover:text-brand-700"
+            @click="expanded.seguimiento = true"
+          >
+            {{ t('dashboard.cargarMas', { n: seguimiento.length - segVisible.length }) }}
+          </button>
         </div>
 
         <div class="rounded-card bg-white px-5 py-5 shadow-card">
@@ -319,12 +353,12 @@ onMounted(async () => {
             </RouterLink>
           </div>
           <p v-if="porOrganizador.length === 0" class="py-3 text-[12.5px] text-ink-400">{{ t('common.sinDatos') }}</p>
-          <div v-else class="flex flex-col text-[13px]">
+          <div v-else class="flex flex-col text-[13px]" :class="expanded.organizador ? 'max-h-[264px] overflow-y-auto pr-1' : ''">
             <div
-              v-for="(row, i) in porOrganizador"
+              v-for="(row, i) in orgVisible"
               :key="row.id ?? 'none'"
               class="flex items-center gap-3 py-2"
-              :class="[i < porOrganizador.length - 1 ? 'border-b border-line-100' : '', row.id ? '' : 'opacity-60']"
+              :class="[i < orgVisible.length - 1 ? 'border-b border-line-100' : '', row.id ? '' : 'opacity-60']"
             >
               <span
                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-[9px] text-xs font-extrabold"
@@ -350,18 +384,26 @@ onMounted(async () => {
               <span v-else class="text-ink-300">—</span>
             </div>
           </div>
+          <button
+            v-if="hasMore(porOrganizador, 'organizador')"
+            type="button"
+            class="mt-1 w-full border-t border-line-100 pt-2 text-center text-xs font-semibold text-brand-600 hover:text-brand-700"
+            @click="expanded.organizador = true"
+          >
+            {{ t('dashboard.cargarMas', { n: porOrganizador.length - orgVisible.length }) }}
+          </button>
         </div>
 
         <div class="rounded-card bg-white px-5 py-5 shadow-card">
           <h2 class="mb-2 text-[13.5px] font-bold">{{ t('dashboard.proximasFechas') }}</h2>
           <p v-if="proximas.length === 0" class="py-3 text-[12.5px] text-ink-400">{{ t('common.sinDatos') }}</p>
-          <div v-else class="flex flex-col text-[13px]">
+          <div v-else class="flex flex-col text-[13px]" :class="expanded.proximas ? 'max-h-[264px] overflow-y-auto pr-1' : ''">
             <RouterLink
-              v-for="(e, i) in proximas"
+              v-for="(e, i) in proxVisible"
               :key="e.id"
               :to="{ name: 'iniciativa-detail', params: { id: e.id } }"
               class="flex items-center gap-3 py-2"
-              :class="i < proximas.length - 1 ? 'border-b border-line-100' : ''"
+              :class="i < proxVisible.length - 1 ? 'border-b border-line-100' : ''"
             >
               <span
                 v-if="e.fechaInicio"
@@ -387,6 +429,14 @@ onMounted(async () => {
               <EstadoChip :value="e.estado" />
             </RouterLink>
           </div>
+          <button
+            v-if="hasMore(proximas, 'proximas')"
+            type="button"
+            class="mt-1 w-full border-t border-line-100 pt-2 text-center text-xs font-semibold text-brand-600 hover:text-brand-700"
+            @click="expanded.proximas = true"
+          >
+            {{ t('dashboard.cargarMas', { n: proximas.length - proxVisible.length }) }}
+          </button>
         </div>
       </section>
 
@@ -399,12 +449,12 @@ onMounted(async () => {
           </RouterLink>
         </div>
         <p v-if="activity.length === 0" class="py-3 text-[12.5px] text-ink-400">{{ t('audit.empty') }}</p>
-        <div v-else class="flex flex-col text-[13px]">
+        <div v-else class="flex flex-col text-[13px]" :class="expanded.actividad ? 'max-h-[264px] overflow-y-auto pr-1' : ''">
           <div
-            v-for="(log, i) in activity"
+            v-for="(log, i) in actVisible"
             :key="log.id"
             class="flex items-center gap-3 py-2"
-            :class="i < activity.length - 1 ? 'border-b border-line-100' : ''"
+            :class="i < actVisible.length - 1 ? 'border-b border-line-100' : ''"
           >
             <span class="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[10.5px] font-bold text-brand-600">
               {{ initials(log.userName) }}
@@ -420,6 +470,14 @@ onMounted(async () => {
             </span>
           </div>
         </div>
+        <button
+          v-if="hasMore(activity, 'actividad')"
+          type="button"
+          class="mt-1 w-full border-t border-line-100 pt-2 text-center text-xs font-semibold text-brand-600 hover:text-brand-700"
+          @click="expanded.actividad = true"
+        >
+          {{ t('dashboard.cargarMas', { n: activity.length - actVisible.length }) }}
+        </button>
       </section>
     </template>
   </div>

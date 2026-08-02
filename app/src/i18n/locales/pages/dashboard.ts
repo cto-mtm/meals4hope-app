@@ -27,6 +27,7 @@ const es = {
   pendienteAgendar: 'Pendiente de agendar',
   activityTitle: 'Actividad reciente',
   verTodo: 'Ver todo →',
+  cargarMas: 'Cargar {n} más',
 }
 
 const en: typeof es = {
@@ -58,6 +59,7 @@ const en: typeof es = {
   pendienteAgendar: 'Pending scheduling',
   activityTitle: 'Recent activity',
   verTodo: 'See all →',
+  cargarMas: 'Load {n} more',
 }
 
 export default { es, en }
