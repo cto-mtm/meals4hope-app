@@ -69,6 +69,15 @@ const existingEntradas = new Set(
     .filter((d) => d.data().deletedAt == null)
     .map((d) => (d.data().nombreIniciativa ?? '').toLowerCase())
 )
+
+// Admin de la iniciativa: resolved from the row's adminEmail against the
+// real login accounts. Unknown emails import as null (warned, not fatal).
+const usersByEmail = new Map(
+  (await db.collection('users').get()).docs.map((d) => [
+    (d.data().email ?? '').toLowerCase(),
+    d.id,
+  ])
+)
 const orgs = await indexByName('organizations')
 const team = await indexByName('teamMembers')
 const contacts = await indexByName('contacts')
@@ -91,6 +100,9 @@ async function ensure(map, collection, entityType, name, data, counterKey) {
 }
 
 for (const row of rows) {
+  if (row.adminEmail && !usersByEmail.has(row.adminEmail)) {
+    console.warn(`⚠ fila ${row.fila}: cuenta no encontrada para ${row.adminEmail} — admin quedará vacío`)
+  }
   if (existingEntradas.has(row.nombreIniciativa.toLowerCase())) {
     created.skipped++
     console.log(`↷ fila ${row.fila}: «${row.nombreIniciativa}» ya existe — omitida`)
@@ -138,7 +150,7 @@ for (const row of rows) {
     fechaFin: row.fechaFin,
     contactoExternoId: contactoId,
     contactoM4hId: gestoraId,
-    adminId: row.adminId ?? null,
+    adminId: row.adminEmail ? (usersByEmail.get(row.adminEmail) ?? null) : null,
     donaron: row.donaron,
     cantidadRecibidaMinor: row.cantidadRecibidaMinor,
     moneda: row.moneda,
