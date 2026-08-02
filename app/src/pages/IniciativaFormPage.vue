@@ -42,6 +42,7 @@ interface IniciativaForm {
   fechaFin: string | null
   contactoExternoId: string | null
   contactoM4hId: string | null
+  adminId: string | null
   donaron: boolean
   cantidadRecibidaMinor: number | null
   moneda: Currency
@@ -61,6 +62,7 @@ const form = ref<IniciativaForm>({
   fechaFin: null,
   contactoExternoId: null,
   contactoM4hId: null,
+  adminId: null,
   donaron: false,
   cantidadRecibidaMinor: null,
   moneda: 'EUR',
@@ -145,6 +147,7 @@ onMounted(async () => {
         fechaFin: e.fechaFin,
         contactoExternoId: e.contactoExternoId,
         contactoM4hId: e.contactoM4hId,
+        adminId: e.adminId ?? null,
         donaron: e.donaron,
         cantidadRecibidaMinor: e.cantidadRecibidaMinor,
         moneda: e.moneda,
@@ -232,6 +235,13 @@ onMounted(async () => {
               <QuickCreateTeamMember @created="(id) => (form.contactoM4hId = id)" />
             </div>
           </div>
+          <BaseSelect
+            v-model="form.adminId"
+            :label="t('iniciativas.admin')"
+            allow-empty
+            :options="directory.activeUsers.map((u) => ({ value: u.id, label: u.name }))"
+            :hint="t('iniciativas.adminHint')"
+          />
         </div>
       </section>
 

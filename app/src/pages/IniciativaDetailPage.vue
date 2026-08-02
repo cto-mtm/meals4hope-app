@@ -228,6 +228,16 @@ onMounted(async () => {
               </dd>
               <dd v-else class="text-ink-400">—</dd>
             </div>
+            <div>
+              <dt class="mb-1 text-[11px] font-bold tracking-[0.5px] text-ink-400 uppercase">{{ t('iniciativas.admin') }}</dt>
+              <dd v-if="iniciativa.adminId" class="flex items-center gap-2">
+                <span class="flex h-5 w-5 items-center justify-center rounded-full bg-navy-900 text-[9px] font-bold text-white">
+                  {{ directory.userName(iniciativa.adminId)[0]?.toUpperCase() }}
+                </span>
+                <span class="font-semibold">{{ directory.userName(iniciativa.adminId) }}</span>
+              </dd>
+              <dd v-else class="text-ink-400">—</dd>
+            </div>
             <div class="sm:col-span-2">
               <dt class="mb-1 text-[11px] font-bold tracking-[0.5px] text-ink-400 uppercase">{{ t('common.descripcion') }}</dt>
               <dd class="leading-relaxed whitespace-pre-wrap" :class="iniciativa.descripcion ? '' : 'text-ink-400'">

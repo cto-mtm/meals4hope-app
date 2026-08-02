@@ -138,6 +138,7 @@ for (const row of rows) {
     fechaFin: row.fechaFin,
     contactoExternoId: contactoId,
     contactoM4hId: gestoraId,
+    adminId: row.adminId ?? null,
     donaron: row.donaron,
     cantidadRecibidaMinor: row.cantidadRecibidaMinor,
     moneda: row.moneda,

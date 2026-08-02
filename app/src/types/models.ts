@@ -151,6 +151,9 @@ export interface Entrada extends BaseDoc {
   fechaFin: string | null // 'YYYY-MM-DD' (ranges: weekend initiatives)
   contactoExternoId: string | null
   contactoM4hId: string | null
+  /** Login account (users) responsible for this iniciativa in the app —
+   * distinct from contactoM4h, which is a data-only team member. */
+  adminId: string | null
   donaron: boolean
   cantidadRecibidaMinor: number | null
   moneda: Currency

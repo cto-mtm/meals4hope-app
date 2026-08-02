@@ -6,8 +6,9 @@ withDefaults(
     /** Adds an empty option at the top (nullable fields). */
     allowEmpty?: boolean
     required?: boolean
+    hint?: string
   }>(),
-  { label: '', allowEmpty: false, required: false }
+  { label: '', allowEmpty: false, required: false, hint: '' }
 )
 
 const model = defineModel<T | null>({ default: null })
@@ -26,5 +27,6 @@ const model = defineModel<T | null>({ default: null })
       <option v-if="allowEmpty" :value="null">—</option>
       <option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
     </select>
+    <span v-if="hint" class="mt-1 block text-[11.5px] text-ink-400">{{ hint }}</span>
   </label>
 </template>
