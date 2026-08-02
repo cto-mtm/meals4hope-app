@@ -32,6 +32,8 @@ const firebaseConfig = useEmulators
 
 export const firebaseApp = initializeApp(firebaseConfig)
 export const auth = getAuth(firebaseApp)
+// Password-reset / verification emails go out in Spanish (the team's language).
+auth.languageCode = 'es'
 // Persistent local cache (IndexedDB): volunteers at events with bad signal
 // get cached reads + queued writes that sync when connectivity returns —
 // and survive an app restart. Multi-tab safe.
