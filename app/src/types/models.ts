@@ -2,8 +2,8 @@ import type { Timestamp } from 'firebase/firestore'
 
 /* ── Vocabulary ──────────────────────────────────────────────── */
 
-export type Currency = 'USD' | 'EUR' | 'VES'
-export const CURRENCIES: Currency[] = ['USD', 'EUR', 'VES']
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'VES'
+export const CURRENCIES: Currency[] = ['USD', 'EUR', 'GBP', 'VES']
 
 export type Role = 'admin' | 'member'
 
@@ -26,6 +26,15 @@ export const CERTIFICADO_ESTADOS: CertificadoEstado[] = ['no_aplica', 'pendiente
 
 export type OrgType = 'beneficiario' | 'organizador' | 'ambos'
 export const ORG_TYPES: OrgType[] = ['beneficiario', 'organizador', 'ambos']
+
+/** Cómo llega el dinero de una iniciativa. Stored as-is (data, not UI). */
+export const MEDIOS_DONACION = [
+  'Recoge y dona total',
+  'Participantes directo web',
+  'MigranodeArena',
+  'Transferencia',
+  'Otros',
+] as const
 
 export type ParentType = 'entrada' | 'salida' | 'factura'
 
@@ -60,9 +69,21 @@ export interface Organization extends BaseDoc {
 
 export interface Contact extends BaseDoc {
   name: string
-  phone: string | null
+  /** Free text on purpose: IG handle, phone, URL — whatever the team has. */
+  metodoContacto: string | null
   email: string | null
   organizationId: string | null
+  notes: string | null
+}
+
+/**
+ * M4H team member as DATA (the "Contacto M4H" of an iniciativa) —
+ * deliberately decoupled from login accounts (users). Most gestoras never
+ * log in; the ones who do get a User account separately.
+ */
+export interface TeamMember extends BaseDoc {
+  name: string
+  email: string | null
   notes: string | null
 }
 
@@ -133,7 +154,12 @@ export interface Entrada extends BaseDoc {
   donaron: boolean
   cantidadRecibidaMinor: number | null
   moneda: Currency
+  /** One of MEDIOS_DONACION (free-ish vocabulary, kept as data). */
+  medioDonacion: string | null
   certificado: CertificadoEstado
+  /** Photo of the granted certificate (Storage download URL + path). */
+  certificadoImagenUrl: string | null
+  certificadoImagenPath: string | null
   graciasEnviado: boolean
   promocionadoInstagram: boolean
   estado: EstadoEntrada
@@ -150,6 +176,7 @@ export type EntityType =
   | 'attachment'
   | 'organization'
   | 'contact'
+  | 'teamMember'
   | 'area'
   | 'linea'
 

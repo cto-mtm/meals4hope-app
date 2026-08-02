@@ -28,3 +28,7 @@ app/android/
 # Misc
 .DS_Store
 .claude/
+
+# Design handoff bundles / build info
+*.zip
+*.tsbuildinfo

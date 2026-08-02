@@ -1,8 +1,10 @@
-// Open Sans (the meals4hope.org typeface), self-hosted so it works
+// Schibsted Grotesk (2026 redesign typeface), self-hosted so it works
 // offline and inside the iOS/Android shells — no runtime Google Fonts.
-import '@fontsource/open-sans/400.css'
-import '@fontsource/open-sans/600.css'
-import '@fontsource/open-sans/700.css'
+import '@fontsource/schibsted-grotesk/400.css'
+import '@fontsource/schibsted-grotesk/500.css'
+import '@fontsource/schibsted-grotesk/600.css'
+import '@fontsource/schibsted-grotesk/700.css'
+import '@fontsource/schibsted-grotesk/800.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'

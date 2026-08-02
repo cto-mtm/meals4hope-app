@@ -23,10 +23,12 @@ service cloud.firestore {
       return signedIn() && me().activo == true && me().role == 'admin';
     }
 
-    // Users: everyone signed in can read (needed to display names, pick
-    // "contacto M4H"); only the Functions API (Admin SDK) writes.
+    // Users: own doc always readable (the login flow checks membership by
+    // reading it); the rest of the roster only for active members. A random
+    // Google account CAN get a valid token for this project (public config),
+    // so "signed in" must never be enough to read member names/emails.
     match /users/{uid} {
-      allow read: if signedIn();
+      allow read: if signedIn() && (request.auth.uid == uid || isActiveMember());
       allow write: if false;
     }
 
@@ -66,11 +68,18 @@ service cloud.firestore {
       allow read, create, update: if isActiveMember();
       allow delete: if false;
     }
+    // M4H team members as data (the "Contacto M4H" of iniciativas) —
+    // decoupled from login accounts (users collection).
+    match /teamMembers/{id} {
+      allow read, create, update: if isActiveMember();
+      allow delete: if false;
+    }
 
-    // Audit log: append-only, immutable.
+    // Audit log: append-only, immutable, and entries can only be written
+    // in the author's own name (no spoofing another member's userId).
     match /auditLogs/{id} {
       allow read: if isActiveMember();
-      allow create: if isActiveMember();
+      allow create: if isActiveMember() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if false;
     }
   }

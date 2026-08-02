@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Full edit form for a Contact (quick-create only covers name/phone/org).
+// Full edit form for a Contact (quick-create only covers name/método/org).
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseButton from './BaseButton.vue'
@@ -17,7 +17,7 @@ const directory = useDirectoryStore()
 
 const form = ref({
   name: null as string | null,
-  phone: null as string | null,
+  metodoContacto: null as string | null,
   email: null as string | null,
   organizationId: null as string | null,
   notes: null as string | null,
@@ -30,7 +30,7 @@ watch(
     if (c) {
       form.value = {
         name: c.name,
-        phone: c.phone,
+        metodoContacto: c.metodoContacto,
         email: c.email,
         organizationId: c.organizationId,
         notes: c.notes,
@@ -46,7 +46,7 @@ async function save() {
   try {
     await directory.updateContact(props.contact, {
       name: form.value.name.trim(),
-      phone: form.value.phone,
+      metodoContacto: form.value.metodoContacto,
       email: form.value.email,
       organizationId: form.value.organizationId,
       notes: form.value.notes,
@@ -62,7 +62,11 @@ async function save() {
   <BaseModal :open="contact !== null" :title="t('contacts.editTitle')" @close="emit('close')">
     <form class="space-y-4" @submit.prevent="save">
       <BaseInput v-model="form.name" :label="t('contacts.name')" required />
-      <BaseInput v-model="form.phone" :label="t('contacts.phone')" type="tel" />
+      <BaseInput
+        v-model="form.metodoContacto"
+        :label="t('contacts.metodoContacto')"
+        :placeholder="t('contacts.metodoPlaceholder')"
+      />
       <BaseInput v-model="form.email" :label="t('contacts.email')" type="email" />
       <BaseSelect
         v-model="form.organizationId"

@@ -4,8 +4,7 @@ const es = {
   closeMenu: 'Cerrar menú',
   nav: {
     dashboard: 'Inicio',
-    entradas: 'Entradas',
-    salidas: 'Salidas',
+    iniciativas: 'Iniciativas',
     partners: 'Aliados',
     admin: 'Admin',
     settings: 'Ajustes',
@@ -18,8 +17,7 @@ const en: typeof es = {
   closeMenu: 'Close menu',
   nav: {
     dashboard: 'Home',
-    entradas: 'Inflows',
-    salidas: 'Outflows',
+    iniciativas: 'Initiatives',
     partners: 'Partners',
     admin: 'Admin',
     settings: 'Settings',

@@ -6,9 +6,10 @@ import facturas from './locales/components/facturas'
 import attachments from './locales/components/attachments'
 import audit from './locales/components/audit'
 import contacts from './locales/components/contacts'
+import team from './locales/components/team'
 import login from './locales/pages/login'
 import dashboard from './locales/pages/dashboard'
-import entradas from './locales/pages/entradas'
+import iniciativas from './locales/pages/iniciativas'
 import salidas from './locales/pages/salidas'
 import partners from './locales/pages/partners'
 import admin from './locales/pages/admin'
@@ -44,9 +45,10 @@ const messages = {
     attachments: attachments.es,
     audit: audit.es,
     contacts: contacts.es,
+    team: team.es,
     login: login.es,
     dashboard: dashboard.es,
-    entradas: entradas.es,
+    iniciativas: iniciativas.es,
     salidas: salidas.es,
     partners: partners.es,
     admin: admin.es,
@@ -60,9 +62,10 @@ const messages = {
     attachments: attachments.en,
     audit: audit.en,
     contacts: contacts.en,
+    team: team.en,
     login: login.en,
     dashboard: dashboard.en,
-    entradas: entradas.en,
+    iniciativas: iniciativas.en,
     salidas: salidas.en,
     partners: partners.en,
     admin: admin.en,
@@ -79,9 +82,12 @@ declare module 'vue-i18n' {
   export interface DefineLocaleMessage extends MessageSchema {}
 }
 
-// Dates: stored UTC, rendered local. Always use d(date, 'short') — never
-// hand-format.
-const datetimeFormats: Record<SupportedLocale, { short: Intl.DateTimeFormatOptions }> = {
+// Dates: stored UTC, rendered local. Always use d(date, '<format>') — never
+// hand-format. 'short' = timestamps; 'day' = date-only fields ("10 jul 2026");
+// 'full' = page headers ("domingo, 20 de julio de 2026"); 'month'/'dayOfMonth'
+// feed the calendar badges on the dashboard.
+type DateFormatKeys = 'short' | 'day' | 'full' | 'month' | 'dayOfMonth'
+const datetimeFormats: Record<SupportedLocale, Record<DateFormatKeys, Intl.DateTimeFormatOptions>> = {
   es: {
     short: {
       day: '2-digit',
@@ -90,6 +96,10 @@ const datetimeFormats: Record<SupportedLocale, { short: Intl.DateTimeFormatOptio
       hour: '2-digit',
       minute: '2-digit',
     },
+    day: { day: 'numeric', month: 'short', year: 'numeric' },
+    full: { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
+    month: { month: 'short' },
+    dayOfMonth: { day: 'numeric' },
   },
   en: {
     short: {
@@ -99,6 +109,10 @@ const datetimeFormats: Record<SupportedLocale, { short: Intl.DateTimeFormatOptio
       hour: '2-digit',
       minute: '2-digit',
     },
+    day: { month: 'short', day: 'numeric', year: 'numeric' },
+    full: { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' },
+    month: { month: 'short' },
+    dayOfMonth: { day: 'numeric' },
   },
 }
 

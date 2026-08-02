@@ -6,9 +6,9 @@ const { t } = useI18n()
 
 <template>
   <div class="flex min-h-dvh flex-col items-center justify-center gap-3 px-4 text-center">
-    <p class="text-5xl font-bold text-stone-300">404</p>
-    <p class="text-sm text-stone-500">{{ t('notFound.message') }}</p>
-    <RouterLink to="/" class="text-sm font-medium text-brand-700 hover:underline">
+    <p class="text-5xl font-bold text-ink-300">404</p>
+    <p class="text-sm text-ink-500">{{ t('notFound.message') }}</p>
+    <RouterLink to="/" class="text-sm font-semibold text-brand-600 hover:underline">
       {{ t('notFound.home') }}
     </RouterLink>
   </div>

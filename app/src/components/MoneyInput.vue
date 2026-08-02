@@ -21,13 +21,13 @@ function onInput(e: Event) {
 
 <template>
   <label class="block">
-    <span v-if="label" class="mb-1 block text-sm font-medium text-stone-600">{{ label }}</span>
+    <span v-if="label" class="mb-1.5 block text-[12.5px] font-semibold text-ink-900">{{ label }}</span>
     <input
       :value="display"
       type="text"
       inputmode="decimal"
       placeholder="0.00"
-      class="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
+      class="w-full rounded-[9px] border border-line-200 bg-white px-3 py-2.5 text-[13px] placeholder:text-ink-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600"
       @input="onInput"
     />
   </label>

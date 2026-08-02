@@ -17,13 +17,13 @@ function setLocale(l: SupportedLocale) {
 </script>
 
 <template>
-  <div class="inline-flex overflow-hidden rounded-lg border border-stone-300 bg-white text-sm font-medium">
+  <div class="inline-flex rounded-[10px] bg-mist-100 p-[3px] text-[12.5px]">
     <button
       v-for="l in SUPPORTED_LOCALES"
       :key="l"
       type="button"
-      class="px-4 py-2 transition-colors"
-      :class="locale === l ? 'bg-brand-700 text-white' : 'text-stone-600 hover:bg-stone-100'"
+      class="rounded-lg px-4.5 py-1.5 transition-colors"
+      :class="locale === l ? 'bg-white font-bold shadow-card' : 'font-semibold text-ink-500 hover:text-ink-600'"
       @click="setLocale(l)"
     >
       {{ t(`settings.locales.${l}`) }}

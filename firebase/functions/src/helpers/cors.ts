@@ -1,12 +1,13 @@
 import type { Request } from 'firebase-functions/v2/https'
 import type { Response } from 'express'
 
-// REPLACE_ME: add your production hosting domain(s) here.
+// Production hosting domains for the meals4hope-app Firebase project.
 // The last two entries are what the iOS/Android Capacitor shells send as
 // Origin — DO NOT delete them or the native apps lose API access.
 const ALLOWED_ORIGINS = [
-  'https://meals4hope.web.app',
-  'https://meals4hope.firebaseapp.com',
+  'https://meals4hope-app.web.app',
+  'https://meals4hope-app.firebaseapp.com',
+  'https://admin.meals4hope.org',
   'http://localhost:5173',
   'capacitor://localhost',
   'http://localhost',

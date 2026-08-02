@@ -10,7 +10,14 @@ import BaseSelect from './BaseSelect.vue'
 import { useDirectoryStore } from '../stores/directory'
 import { ORG_TYPES, type OrgType } from '../types/models'
 
-const props = defineProps<{ defaultType: OrgType }>()
+const props = withDefaults(
+  defineProps<{
+    defaultType: OrgType
+    /** 'link' = inline text trigger (inside forms); 'button' = solid CTA. */
+    variant?: 'link' | 'button'
+  }>(),
+  { variant: 'link' }
+)
 const emit = defineEmits<{ created: [id: string] }>()
 const { t } = useI18n()
 const directory = useDirectoryStore()
@@ -37,7 +44,15 @@ const typeOptions = ORG_TYPES.map((v) => ({ value: v, label: t(`partners.types.$
 </script>
 
 <template>
-  <button type="button" class="text-xs font-medium text-brand-700 hover:underline" @click="open = true">
+  <button
+    v-if="props.variant === 'button'"
+    type="button"
+    class="rounded-[9px] bg-brand-600 px-4 py-2 text-[13px] font-semibold whitespace-nowrap text-white hover:bg-brand-700"
+    @click="open = true"
+  >
+    + {{ t('partners.quickCreate') }}
+  </button>
+  <button v-else type="button" class="text-xs font-semibold text-brand-600 hover:underline" @click="open = true">
     + {{ t('partners.quickCreate') }}
   </button>
 

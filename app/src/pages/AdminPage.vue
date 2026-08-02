@@ -5,14 +5,17 @@ import BaseButton from '../components/BaseButton.vue'
 import BaseInput from '../components/BaseInput.vue'
 import BaseModal from '../components/BaseModal.vue'
 import BaseSelect from '../components/BaseSelect.vue'
+import BaseTextarea from '../components/BaseTextarea.vue'
 import EmptyState from '../components/EmptyState.vue'
+import QuickCreateTeamMember from '../components/QuickCreateTeamMember.vue'
 import { apiFetch } from '../lib/api'
-import { useCatalogsStore } from '../stores/catalogs'
 import { useDirectoryStore } from '../stores/directory'
-import type { Role, User } from '../types/models'
+import type { Role, TeamMember, User } from '../types/models'
+
+// Catalog management (Áreas/Líneas) left this page with the 2026 redesign —
+// the catalogs and their store remain for the hidden Salidas module.
 
 const { t } = useI18n()
-const catalogs = useCatalogsStore()
 const directory = useDirectoryStore()
 
 /* ── Users ───────────────────────────────────────────────────── */
@@ -83,56 +86,113 @@ async function toggleRole(u: User) {
   if (!res.ok) userError.value = res.error
 }
 
-/* ── Catalogs ────────────────────────────────────────────────── */
-const newArea = ref<string | null>(null)
-const newLinea = ref<string | null>(null)
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('')
+}
 
-async function addCatalog(type: 'area' | 'linea') {
-  const model = type === 'area' ? newArea : newLinea
-  if (!model.value?.trim()) return
-  await catalogs.addItem(type, model.value.trim())
-  model.value = null
+/* ── Equipo M4H (data records, no login) ─────────────────────── */
+const editingMember = ref<TeamMember | null>(null)
+const memberForm = ref({
+  name: null as string | null,
+  email: null as string | null,
+  notes: null as string | null,
+})
+const savingMember = ref(false)
+
+function openMemberEdit(m: TeamMember) {
+  editingMember.value = m
+  memberForm.value = { name: m.name, email: m.email, notes: m.notes }
+}
+
+async function saveMember() {
+  if (!editingMember.value || !memberForm.value.name?.trim()) return
+  savingMember.value = true
+  try {
+    await directory.updateTeamMember(editingMember.value, {
+      name: memberForm.value.name.trim(),
+      email: memberForm.value.email?.trim() || null,
+      notes: memberForm.value.notes,
+    })
+    editingMember.value = null
+  } finally {
+    savingMember.value = false
+  }
+}
+
+async function removeMember() {
+  if (!editingMember.value || !confirm(t('team.confirmDelete'))) return
+  savingMember.value = true
+  try {
+    await directory.deleteTeamMember(editingMember.value)
+    editingMember.value = null
+  } finally {
+    savingMember.value = false
+  }
 }
 
 onMounted(() => {
   loadUsers()
-  catalogs.load()
+  directory.load()
 })
 </script>
 
 <template>
-  <div class="space-y-8">
-    <div class="flex items-center justify-between">
-      <h1 class="text-xl font-bold">{{ t('admin.title') }}</h1>
-      <RouterLink :to="{ name: 'activity' }" class="text-sm font-medium text-brand-700 hover:underline">
+  <div>
+    <div class="mb-5 flex items-center justify-between">
+      <h1 class="text-[22px] font-bold tracking-[-0.3px]">{{ t('admin.title') }}</h1>
+      <RouterLink :to="{ name: 'activity' }" class="text-[12.5px] font-semibold text-brand-600">
         {{ t('admin.viewActivity') }}
       </RouterLink>
     </div>
 
-    <!-- Users -->
-    <section>
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="font-semibold text-stone-700">{{ t('admin.usersTitle') }}</h2>
-        <BaseButton @click="showCreate = true">{{ t('admin.newUser') }}</BaseButton>
+    <!-- Members -->
+    <section class="rounded-card bg-white shadow-card">
+      <div class="flex items-center justify-between border-b border-line-100 px-5 py-4">
+        <h2 class="text-[13.5px] font-bold">{{ t('admin.usersTitle') }}</h2>
+        <button
+          type="button"
+          class="rounded-lg bg-brand-600 px-3.5 py-1.5 text-[12.5px] font-semibold whitespace-nowrap text-white hover:bg-brand-700"
+          @click="showCreate = true"
+        >
+          + {{ t('admin.newUser') }}
+        </button>
       </div>
 
-      <p v-if="userError" class="mb-2 text-sm text-red-600">{{ userError }}</p>
-      <p v-if="loadingUsers" class="text-sm text-stone-400">{{ t('common.cargando') }}</p>
+      <p v-if="userError" class="px-5 pt-3 text-sm text-danger-600">{{ userError }}</p>
+      <p v-if="loadingUsers" class="px-5 py-4 text-[13px] text-ink-400">{{ t('common.cargando') }}</p>
 
-      <EmptyState v-else-if="users.length === 0" :message="t('admin.noUsers')" />
+      <div v-else-if="users.length === 0" class="px-5 py-4">
+        <EmptyState :message="t('admin.noUsers')" />
+      </div>
 
       <!-- No overflow-hidden here: it would clip the kebab dropdown -->
-      <ul v-else class="divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
-        <li v-for="u in users" :key="u.id" class="flex flex-wrap items-center gap-2 px-4 py-3">
+      <div v-else>
+        <div
+          v-for="(u, i) in users"
+          :key="u.id"
+          class="flex flex-wrap items-center gap-3 px-5 py-3"
+          :class="i < users.length - 1 ? 'border-b border-line-100/60' : ''"
+        >
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+            :class="u.role === 'admin' ? 'bg-navy-900 text-white' : 'bg-leaf-100 text-leaf-700'"
+          >
+            {{ initials(u.name) }}
+          </span>
           <div class="min-w-0 flex-1">
-            <p class="truncate text-sm font-medium" :class="u.activo ? '' : 'text-stone-400 line-through'">
+            <p class="truncate text-[13.5px] font-bold" :class="u.activo ? '' : 'text-ink-400 line-through'">
               {{ u.name }}
             </p>
-            <p class="truncate text-xs text-stone-400">{{ u.email }}</p>
+            <p class="truncate text-xs text-ink-400">{{ u.email }}</p>
           </div>
           <span
-            class="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-            :class="u.role === 'admin' ? 'bg-brand-100 text-brand-800' : 'bg-stone-100 text-stone-600'"
+            class="rounded-full px-2.5 py-0.5 text-[11px] font-bold"
+            :class="u.role === 'admin' ? 'bg-brand-50 text-brand-600' : 'bg-mist-100 text-ink-600'"
           >
             {{ t(`admin.roles.${u.role}`) }}
           </span>
@@ -141,7 +201,7 @@ onMounted(() => {
           <div class="relative">
             <button
               type="button"
-              class="rounded-full p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+              class="rounded-full p-1.5 text-ink-300 hover:bg-mist-100 hover:text-ink-600"
               :aria-label="t('admin.userActions')"
               :aria-expanded="menuFor === u.id"
               @click="menuFor = menuFor === u.id ? null : u.id"
@@ -155,63 +215,87 @@ onMounted(() => {
 
             <div
               v-if="menuFor === u.id"
-              class="absolute top-full right-0 z-20 mt-1 w-56 overflow-hidden rounded-lg border border-stone-200 bg-white py-1 shadow-lg"
+              class="absolute top-full right-0 z-20 mt-1 w-56 overflow-hidden rounded-lg border border-line-200 bg-white py-1 shadow-lg"
             >
               <button
                 type="button"
-                class="block w-full px-4 py-2.5 text-left text-sm text-stone-700 hover:bg-stone-50"
+                class="block w-full px-4 py-2.5 text-left text-sm hover:bg-mist-200"
                 @click="toggleRole(u)"
               >
                 {{ u.role === 'admin' ? t('admin.makeMember') : t('admin.makeAdmin') }}
               </button>
               <button
                 type="button"
-                class="block w-full px-4 py-2.5 text-left text-sm hover:bg-stone-50"
-                :class="u.activo ? 'text-red-600' : 'text-stone-700'"
+                class="block w-full px-4 py-2.5 text-left text-sm hover:bg-mist-200"
+                :class="u.activo ? 'text-danger-600' : ''"
                 @click="toggleActive(u)"
               >
                 {{ u.activo ? t('admin.deactivate') : t('admin.activate') }}
               </button>
             </div>
           </div>
-        </li>
-      </ul>
+        </div>
+      </div>
 
       <!-- Click-away catcher while a menu is open -->
       <div v-if="menuFor" class="fixed inset-0 z-10" @click="menuFor = null" />
     </section>
 
-    <!-- Catalogs -->
-    <section class="grid gap-6 sm:grid-cols-2">
-      <div v-for="cat in ([{ type: 'area', title: t('admin.areasTitle'), items: catalogs.areas }, { type: 'linea', title: t('admin.lineasTitle'), items: catalogs.lineas }] as const)" :key="cat.type">
-        <h2 class="mb-3 font-semibold text-stone-700">{{ cat.title }}</h2>
-        <ul class="divide-y divide-stone-100 overflow-hidden rounded-xl border border-stone-200 bg-white">
-          <li v-for="item in cat.items" :key="item.id" class="flex items-center gap-2 px-4 py-2.5">
-            <span class="flex-1 text-sm" :class="item.activo ? '' : 'text-stone-400 line-through'">
-              {{ item.nombre }}
-            </span>
-            <button
-              type="button"
-              class="text-xs font-medium"
-              :class="item.activo ? 'text-red-500 hover:text-red-700' : 'text-brand-700 hover:text-brand-800'"
-              @click="catalogs.toggleItem(cat.type, item)"
-            >
-              {{ item.activo ? t('admin.catalogOff') : t('admin.catalogOn') }}
-            </button>
-          </li>
-        </ul>
-        <form class="mt-2 flex gap-2" @submit.prevent="addCatalog(cat.type)">
-          <div class="flex-1">
-            <BaseInput
-              :model-value="cat.type === 'area' ? newArea : newLinea"
-              :placeholder="t('admin.newItemPlaceholder')"
-              @update:model-value="(v: string | null) => (cat.type === 'area' ? (newArea = v) : (newLinea = v))"
-            />
+    <!-- Equipo M4H: gestoras de iniciativas (data, sin cuenta de acceso) -->
+    <section class="mt-4 rounded-card bg-white shadow-card">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line-100 px-5 py-4">
+        <div>
+          <h2 class="text-[13.5px] font-bold">{{ t('team.title') }}</h2>
+          <p class="mt-0.5 text-xs text-ink-400">{{ t('team.subtitle') }}</p>
+        </div>
+        <QuickCreateTeamMember />
+      </div>
+
+      <div v-if="directory.teamMembers.length === 0" class="px-5 py-4">
+        <EmptyState :message="t('team.empty')" />
+      </div>
+
+      <div v-else>
+        <div
+          v-for="(m, i) in directory.teamMembers"
+          :key="m.id"
+          class="flex items-center gap-3 px-5 py-3"
+          :class="i < directory.teamMembers.length - 1 ? 'border-b border-line-100/60' : ''"
+        >
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf-100 text-[11px] font-bold text-leaf-700">
+            {{ initials(m.name) }}
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-[13.5px] font-bold">{{ m.name }}</p>
+            <p class="truncate text-xs text-ink-400">{{ m.email ?? '—' }}</p>
           </div>
-          <BaseButton type="submit" variant="secondary">{{ t('common.agregar') }}</BaseButton>
-        </form>
+          <button
+            type="button"
+            class="text-[12.5px] font-semibold text-brand-600 hover:underline"
+            @click="openMemberEdit(m)"
+          >
+            {{ t('common.editar') }}
+          </button>
+        </div>
       </div>
     </section>
+
+    <!-- Edit team member modal -->
+    <BaseModal :open="editingMember !== null" :title="t('team.editTitle')" @close="editingMember = null">
+      <form class="space-y-4" @submit.prevent="saveMember">
+        <BaseInput v-model="memberForm.name" :label="t('team.name')" required />
+        <BaseInput v-model="memberForm.email" :label="t('team.email')" type="email" :hint="t('team.emailHint')" />
+        <BaseTextarea v-model="memberForm.notes" :label="t('common.notas')" />
+        <div class="flex gap-2">
+          <BaseButton type="submit" :disabled="savingMember" class="flex-1">
+            {{ savingMember ? t('common.cargando') : t('common.guardar') }}
+          </BaseButton>
+          <BaseButton variant="danger" :disabled="savingMember" @click="removeMember">
+            {{ t('common.eliminar') }}
+          </BaseButton>
+        </div>
+      </form>
+    </BaseModal>
 
     <!-- Create user modal -->
     <BaseModal :open="showCreate" :title="t('admin.newUser')" @close="showCreate = false">
@@ -232,7 +316,7 @@ onMounted(() => {
             { value: 'admin', label: t('admin.roles.admin') },
           ]"
         />
-        <p v-if="createError" class="text-sm text-red-600">{{ createError }}</p>
+        <p v-if="createError" class="text-sm text-danger-600">{{ createError }}</p>
         <BaseButton type="submit" block :disabled="creating">
           {{ creating ? t('common.cargando') : t('common.crear') }}
         </BaseButton>

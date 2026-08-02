@@ -6,23 +6,33 @@
 import { defineStore } from 'pinia'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import { createEntity, fetchAll, updateEntity } from '../lib/db'
-import type { Contact, Organization, OrgType, User } from '../types/models'
+import { createEntity, fetchAll, softDeleteEntity, updateEntity } from '../lib/db'
+import type { Contact, Organization, OrgType, TeamMember, User } from '../types/models'
 
 interface State {
   organizations: Organization[]
   contacts: Contact[]
+  /** "Contacto M4H" of iniciativas — data records, decoupled from accounts. */
+  teamMembers: TeamMember[]
   users: User[]
   loaded: boolean
 }
 
 export const useDirectoryStore = defineStore('directory', {
-  state: (): State => ({ organizations: [], contacts: [], users: [], loaded: false }),
+  state: (): State => ({
+    organizations: [],
+    contacts: [],
+    teamMembers: [],
+    users: [],
+    loaded: false,
+  }),
   getters: {
     orgName: (s) => (id: string | null) =>
       id ? (s.organizations.find((o) => o.id === id)?.name ?? '—') : '—',
     contactName: (s) => (id: string | null) =>
       id ? (s.contacts.find((c) => c.id === id)?.name ?? '—') : '—',
+    teamMemberName: (s) => (id: string | null) =>
+      id ? (s.teamMembers.find((m) => m.id === id)?.name ?? '—') : '—',
     userName: (s) => (id: string | null) =>
       id ? (s.users.find((u) => u.id === id)?.name ?? '—') : '—',
     activeUsers: (s) => s.users.filter((u) => u.activo),
@@ -30,13 +40,15 @@ export const useDirectoryStore = defineStore('directory', {
   actions: {
     async load(force = false) {
       if (this.loaded && !force) return
-      const [orgs, contacts, usersSnap] = await Promise.all([
+      const [orgs, contacts, teamMembers, usersSnap] = await Promise.all([
         fetchAll<Organization>('organization'),
         fetchAll<Contact>('contact'),
+        fetchAll<TeamMember>('teamMember'),
         getDocs(collection(db, 'users')),
       ])
       this.organizations = orgs.sort((a, b) => a.name.localeCompare(b.name))
       this.contacts = contacts.sort((a, b) => a.name.localeCompare(b.name))
+      this.teamMembers = teamMembers.sort((a, b) => a.name.localeCompare(b.name))
       this.users = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as User)
       this.loaded = true
     },
@@ -62,7 +74,7 @@ export const useDirectoryStore = defineStore('directory', {
       contact: Contact,
       patch: {
         name: string
-        phone: string | null
+        metodoContacto: string | null
         email: string | null
         organizationId: string | null
         notes: string | null
@@ -79,16 +91,38 @@ export const useDirectoryStore = defineStore('directory', {
     },
     async quickCreateContact(
       name: string,
-      phone: string | null,
+      metodoContacto: string | null,
       organizationId: string | null
     ): Promise<string> {
       const id = await createEntity(
         'contact',
-        { name, phone, email: null, organizationId, notes: null },
+        { name, metodoContacto, email: null, organizationId, notes: null },
         name
       )
       await this.load(true)
       return id
+    },
+    async quickCreateTeamMember(name: string, email: string | null): Promise<string> {
+      const id = await createEntity('teamMember', { name, email, notes: null }, name)
+      await this.load(true)
+      return id
+    },
+    async updateTeamMember(
+      member: TeamMember,
+      patch: { name: string; email: string | null; notes: string | null }
+    ): Promise<void> {
+      await updateEntity(
+        'teamMember',
+        member.id,
+        patch,
+        member as unknown as Record<string, unknown>,
+        patch.name
+      )
+      await this.load(true)
+    },
+    async deleteTeamMember(member: TeamMember): Promise<void> {
+      await softDeleteEntity('teamMember', member.id, member.name)
+      await this.load(true)
     },
   },
 })

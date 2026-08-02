@@ -13,12 +13,12 @@ const props = withDefaults(
 
 const classes = computed(() => {
   const base =
-    'inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none'
+    'inline-flex items-center justify-center gap-1.5 rounded-[9px] px-4 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none'
   const variants = {
-    primary: 'bg-brand-700 text-white hover:bg-brand-800 active:bg-brand-800',
-    secondary: 'bg-white text-stone-700 border border-stone-300 hover:bg-stone-100',
-    danger: 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100',
-    ghost: 'text-brand-700 hover:bg-brand-50',
+    primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-700',
+    secondary: 'bg-white text-ink-900 border border-line-200 hover:bg-mist-200',
+    danger: 'bg-white text-danger-600 border border-danger-200 hover:bg-red-50',
+    ghost: 'text-brand-600 hover:bg-brand-50',
   }
   return [base, variants[props.variant], props.block ? 'w-full' : ''].join(' ')
 })

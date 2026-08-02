@@ -74,29 +74,29 @@ async function resetPassword() {
 </script>
 
 <template>
-  <div class="flex min-h-dvh items-center justify-center bg-stone-100 px-4">
-    <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm">
-      <h1 class="text-center text-2xl font-bold text-brand-700">Meals4Hope</h1>
-      <p class="mt-1 text-center text-sm text-stone-500">{{ t('login.subtitle') }}</p>
+  <div class="flex min-h-dvh items-center justify-center bg-paper px-4">
+    <div class="w-full max-w-sm rounded-card bg-white p-8 shadow-card">
+      <h1 class="text-center text-2xl font-bold text-brand-600">Meals4Hope</h1>
+      <p class="mt-1 text-center text-sm text-ink-500">{{ t('login.subtitle') }}</p>
 
       <form class="mt-6 space-y-4" @submit.prevent="submit">
         <BaseInput v-model="email" :label="t('login.email')" type="email" required />
         <BaseInput v-model="password" :label="t('login.password')" type="password" required />
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="text-sm text-danger-600">{{ error }}</p>
         <BaseButton type="submit" block :disabled="loading">
           {{ loading ? t('common.cargando') : t('login.submit') }}
         </BaseButton>
       </form>
 
       <div class="my-4 flex items-center gap-3">
-        <span class="h-px flex-1 bg-stone-200" />
-        <span class="text-xs text-stone-400">{{ t('login.or') }}</span>
-        <span class="h-px flex-1 bg-stone-200" />
+        <span class="h-px flex-1 bg-line-200" />
+        <span class="text-xs text-ink-400">{{ t('login.or') }}</span>
+        <span class="h-px flex-1 bg-line-200" />
       </div>
 
       <button
         type="button"
-        class="flex w-full items-center justify-center gap-2.5 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 disabled:pointer-events-none disabled:opacity-50"
+        class="flex w-full items-center justify-center gap-2.5 rounded-[9px] border border-line-200 bg-white px-4 py-2.5 text-sm font-medium transition-colors hover:bg-mist-200 disabled:pointer-events-none disabled:opacity-50"
         :disabled="googleLoading"
         @click="googleLogin"
       >
@@ -112,20 +112,20 @@ async function resetPassword() {
       <div class="mt-3 text-center">
         <button
           type="button"
-          class="text-xs font-medium text-brand-700 hover:underline"
+          class="text-xs font-medium text-brand-600 hover:underline"
           @click="resetPassword"
         >
           {{ t('login.forgot') }}
         </button>
-        <p v-if="resetState === 'sent'" class="mt-1 text-xs text-emerald-600">
+        <p v-if="resetState === 'sent'" class="mt-1 text-xs text-leaf-700">
           {{ t('login.resetSent') }}
         </p>
-        <p v-else-if="resetState === 'needEmail'" class="mt-1 text-xs text-amber-600">
+        <p v-else-if="resetState === 'needEmail'" class="mt-1 text-xs text-sun-700">
           {{ t('login.resetNeedEmail') }}
         </p>
       </div>
 
-      <p class="mt-4 text-center text-xs text-stone-400">{{ t('login.noSignup') }}</p>
+      <p class="mt-4 text-center text-xs text-ink-400">{{ t('login.noSignup') }}</p>
     </div>
   </div>
 </template>

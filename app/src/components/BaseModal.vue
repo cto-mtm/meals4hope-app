@@ -13,12 +13,14 @@ const emit = defineEmits<{ close: [] }>()
         class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
         @click.self="emit('close')"
       >
-        <div class="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-5 pb-safe shadow-xl sm:rounded-2xl">
+        <!-- Bottom padding = own padding PLUS the safe area (pb-safe alone
+             would collapse to 0 on desktop and clip the last control). -->
+        <div class="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-xl sm:rounded-card">
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-base font-semibold text-stone-800">{{ title }}</h2>
+            <h2 class="text-base font-bold">{{ title }}</h2>
             <button
               type="button"
-              class="rounded-full p-1.5 text-stone-400 hover:bg-stone-100"
+              class="rounded-full p-1.5 text-ink-400 hover:bg-mist-100"
               aria-label="×"
               @click="emit('close')"
             >

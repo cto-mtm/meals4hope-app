@@ -5,16 +5,17 @@ const es = {
   editTitle: 'Editar aliado',
   name: 'Nombre',
   type: 'Tipo',
+  searchPlaceholder: 'Buscar aliado…',
   types: {
     beneficiario: 'Beneficiario',
     organizador: 'Organizador',
     ambos: 'Ambos',
   },
-  apoyosRecibidos: '{n} apoyos recibidos',
+  vinculadas: '{n} iniciativa vinculada | {n} iniciativas vinculadas',
+  sinIniciativas: 'Sin iniciativas aún',
   iniciativas: '{n} iniciativas',
-  salidasTitle: 'Apoyos recibidos (Salidas)',
-  entradasTitle: 'Iniciativas organizadas (Entradas)',
-  noHistory: 'Sin entradas ni salidas vinculadas todavía.',
+  iniciativasTitle: 'Iniciativas organizadas',
+  noHistory: 'Sin iniciativas vinculadas todavía.',
 }
 
 const en: typeof es = {
@@ -24,16 +25,17 @@ const en: typeof es = {
   editTitle: 'Edit partner',
   name: 'Name',
   type: 'Type',
+  searchPlaceholder: 'Search partner…',
   types: {
     beneficiario: 'Beneficiary',
     organizador: 'Organizer',
     ambos: 'Both',
   },
-  apoyosRecibidos: '{n} supports received',
+  vinculadas: '{n} linked initiative | {n} linked initiatives',
+  sinIniciativas: 'No initiatives yet',
   iniciativas: '{n} initiatives',
-  salidasTitle: 'Supports received (Outflows)',
-  entradasTitle: 'Initiatives organized (Inflows)',
-  noHistory: 'No linked inflows or outflows yet.',
+  iniciativasTitle: 'Initiatives organized',
+  noHistory: 'No linked initiatives yet.',
 }
 
 export default { es, en }

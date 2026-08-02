@@ -8,15 +8,22 @@ export const router = createRouter({
     { path: '/login', name: 'login', component: () => import('../pages/LoginPage.vue'), meta: { public: true } },
     { path: '/', name: 'dashboard', component: () => import('../pages/DashboardPage.vue') },
 
-    { path: '/entradas', name: 'entradas', component: () => import('../pages/EntradasListPage.vue') },
-    { path: '/entradas/nueva', name: 'entrada-new', component: () => import('../pages/EntradaFormPage.vue') },
-    { path: '/entradas/:id', name: 'entrada-detail', component: () => import('../pages/EntradaDetailPage.vue') },
-    { path: '/entradas/:id/editar', name: 'entrada-edit', component: () => import('../pages/EntradaFormPage.vue') },
+    // Entradas renamed to Iniciativas in the 2026 redesign — the Firestore
+    // collection is still `entradas`; only routes/UI say "iniciativas".
+    { path: '/iniciativas', name: 'iniciativas', component: () => import('../pages/IniciativasListPage.vue') },
+    { path: '/iniciativas/nueva', name: 'iniciativa-new', component: () => import('../pages/IniciativaFormPage.vue') },
+    { path: '/iniciativas/:id', name: 'iniciativa-detail', component: () => import('../pages/IniciativaDetailPage.vue') },
+    { path: '/iniciativas/:id/editar', name: 'iniciativa-edit', component: () => import('../pages/IniciativaFormPage.vue') },
+    // Old bookmarks keep working after the rename.
+    { path: '/entradas', redirect: { name: 'iniciativas' } },
+    { path: '/entradas/:sub(.*)', redirect: (to) => `/iniciativas/${to.params.sub as string}` },
 
-    { path: '/salidas', name: 'salidas', component: () => import('../pages/SalidasListPage.vue') },
-    { path: '/salidas/nueva', name: 'salida-new', component: () => import('../pages/SalidaFormPage.vue') },
-    { path: '/salidas/:id', name: 'salida-detail', component: () => import('../pages/SalidaDetailPage.vue') },
-    { path: '/salidas/:id/editar', name: 'salida-edit', component: () => import('../pages/SalidaFormPage.vue') },
+    // Salidas are hidden for now (nav + routes removed). The pages, locale
+    // modules, and Firestore data stay intact — restore by re-adding these:
+    // { path: '/salidas', name: 'salidas', component: () => import('../pages/SalidasListPage.vue') },
+    // { path: '/salidas/nueva', name: 'salida-new', component: () => import('../pages/SalidaFormPage.vue') },
+    // { path: '/salidas/:id', name: 'salida-detail', component: () => import('../pages/SalidaDetailPage.vue') },
+    // { path: '/salidas/:id/editar', name: 'salida-edit', component: () => import('../pages/SalidaFormPage.vue') },
 
     { path: '/socios', name: 'partners', component: () => import('../pages/PartnersListPage.vue') },
     { path: '/socios/:id', name: 'partner-detail', component: () => import('../pages/PartnerDetailPage.vue') },

@@ -33,6 +33,7 @@ export const COLLECTIONS: Record<EntityType, string> = {
   attachment: 'attachments',
   organization: 'organizations',
   contact: 'contacts',
+  teamMember: 'teamMembers',
   area: 'areas',
   linea: 'lineas',
 }

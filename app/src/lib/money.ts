@@ -17,7 +17,7 @@ export function toDisplay(minor: number | null | undefined): string {
   return (minor / 100).toFixed(2)
 }
 
-const SYMBOLS: Record<Currency, string> = { USD: '$', EUR: '€', VES: 'Bs.' }
+const SYMBOLS: Record<Currency, string> = { USD: '$', EUR: '€', GBP: '£', VES: 'Bs.' }
 
 export function formatMoney(minor: number | null | undefined, moneda: Currency, locale = 'es'): string {
   if (minor === null || minor === undefined) return '—'

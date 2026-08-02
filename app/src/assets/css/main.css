@@ -1,22 +1,41 @@
 @import 'tailwindcss';
 
-/* Brand tokens sampled from meals4hope.org (Divi theme):
-   deep blue #3d78b7 (buttons), bright blue #2ea3f2 (links/accents),
-   green #73bf43 (logo/highlights), warm off-white #f5f4ee (sections),
-   warm grays #706868 / #5b5252 (headings). Font: Open Sans. */
+/* Design tokens from the 2026 redesign (Claude Design handoff):
+   page #f3f5f7, sidebar navy #152c47, accent blue #2f6db8, green #7cc24a,
+   amber #eab53e, ink #182234, grays #5c6a7a/#8a93a0/#9aa4b0,
+   borders #e2e7ec/#f0f2f5. Font: Schibsted Grotesk. */
 @theme {
-  --color-brand-50: #eef5fb;
-  --color-brand-100: #d9e8f5;
-  --color-brand-500: #4a86c4;
-  --color-brand-600: #3d78b7;
-  --color-brand-700: #35689f;
-  --color-brand-800: #2b5484;
-  --color-accent-500: #2ea3f2;
-  --color-leaf-100: #e4f3d9;
-  --color-leaf-600: #73bf43;
-  --color-leaf-700: #5da335;
-  --color-paper: #f5f4ee;
-  --font-sans: 'Open Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --color-brand-50: #e9f1fa;
+  --color-brand-100: #d7e6f5;
+  --color-brand-400: #6f9bd1;
+  --color-brand-600: #2f6db8;
+  --color-brand-700: #1d4f8c;
+  --color-brand-800: #17406f;
+  --color-navy-800: #1e3c60;
+  --color-navy-900: #152c47;
+  --color-leaf-100: #eef7e6;
+  --color-leaf-500: #7cc24a;
+  --color-leaf-700: #4e8c25;
+  --color-leaf-900: #12290a;
+  --color-sun-100: #fdf3e3;
+  --color-sun-500: #eab53e;
+  --color-sun-700: #b06e12;
+  --color-ink-300: #c6ccd4;
+  --color-ink-400: #9aa4b0;
+  --color-ink-500: #8a93a0;
+  --color-ink-600: #5c6a7a;
+  --color-ink-900: #182234;
+  --color-line-100: #f0f2f5;
+  --color-line-200: #e2e7ec;
+  --color-mist-100: #eef1f4;
+  --color-mist-200: #f8fafc;
+  --color-paper: #f3f5f7;
+  --color-danger-200: #f3d7d7;
+  --color-danger-600: #c04747;
+  --radius-card: 14px;
+  --font-sans: 'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --shadow-card: 0 1px 2px rgba(21, 44, 71, 0.06);
+  --shadow-card-hover: 0 3px 10px rgba(21, 44, 71, 0.12);
 }
 
 /* Safe-area utilities: correct in the browser AND inside the iOS/Android
@@ -36,6 +55,6 @@ html {
 }
 
 body {
-  @apply bg-paper text-stone-700 antialiased;
+  @apply bg-paper text-ink-900 antialiased;
   font-family: var(--font-sans);
 }

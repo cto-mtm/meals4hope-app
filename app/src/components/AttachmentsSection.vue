@@ -96,12 +96,12 @@ onMounted(load)
 
 <template>
   <section>
-    <div class="mb-2 flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-stone-700">{{ t('attachments.title') }}</h3>
+    <div class="mb-2.5 flex items-center justify-between">
+      <h3 class="text-[13.5px] font-bold">{{ t('attachments.title') }}</h3>
       <label
-        class="cursor-pointer rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-medium text-stone-600 hover:bg-stone-50"
+        class="cursor-pointer rounded-lg border border-line-200 bg-white px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-mist-200"
       >
-        {{ uploading ? t('common.cargando') : t('attachments.add') }}
+        ↑ {{ uploading ? t('common.cargando') : t('attachments.add') }}
         <input
           ref="fileInput"
           type="file"
@@ -114,8 +114,11 @@ onMounted(load)
       </label>
     </div>
 
-    <p v-if="error" class="mb-2 text-xs text-red-600">{{ error }}</p>
-    <p v-if="attachments.length === 0" class="text-xs text-stone-400">
+    <p v-if="error" class="mb-2 text-xs text-danger-600">{{ error }}</p>
+    <p
+      v-if="attachments.length === 0"
+      class="rounded-[10px] border-[1.5px] border-dashed border-line-200 py-4 text-center text-[12.5px] text-ink-400"
+    >
       {{ t('attachments.empty') }}
     </p>
 

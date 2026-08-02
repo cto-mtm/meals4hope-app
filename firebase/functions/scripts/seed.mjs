@@ -116,8 +116,9 @@ if (DEMO) {
   if (hasData) {
     console.log('↷ demo data already present — skipping')
   } else {
-    const carolinaUid = await ensureUser(MEMBERS[0], 'member')
-    const lorenaUid = await ensureUser(MEMBERS[1], 'member')
+    // Login accounts (can enter the app)…
+    await ensureUser(MEMBERS[0], 'member')
+    await ensureUser(MEMBERS[1], 'member')
 
     async function create(collection, entityType, label, data) {
       const ref = await db.collection(collection).add({ ...data, ...stamps(adminUid) })
@@ -125,6 +126,19 @@ if (DEMO) {
       console.log(`✓ ${collection}: ${label}`)
       return ref.id
     }
+
+    // …and team members as DATA (the "Contacto M4H" of iniciativas),
+    // deliberately decoupled from accounts.
+    const carolinaUid = await create('teamMembers', 'teamMember', 'Carolina', {
+      name: 'Carolina',
+      email: 'carolina@meals4hope.org',
+      notes: null,
+    })
+    const lorenaUid = await create('teamMembers', 'teamMember', 'Lorena', {
+      name: 'Lorena',
+      email: 'lorena@meals4hope.org',
+      notes: null,
+    })
 
     /* Aliados */
     const bomberos = await create('organizations', 'organization', 'Bomberos UCV', {
@@ -151,14 +165,14 @@ if (DEMO) {
     /* Contactos */
     const joseC = await create('contacts', 'contact', 'Cap. José Rodríguez', {
       name: 'Cap. José Rodríguez',
-      phone: '+58 412 5550101',
+      metodoContacto: '+58 412 5550101',
       email: null,
       organizationId: bomberos,
       notes: null,
     })
     const maria = await create('contacts', 'contact', 'María Pérez', {
       name: 'María Pérez',
-      phone: '+34 600 555 001',
+      metodoContacto: '+34 600 555 001',
       email: 'maria@suchikito.example',
       organizationId: suchi,
       notes: null,
